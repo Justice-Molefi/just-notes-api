@@ -1,8 +1,12 @@
 package com.justice.nkopane.justnotes.auth;
 
+import com.justice.nkopane.justnotes.service.TokenService;
 import com.justice.nkopane.justnotes.user.Role;
 import com.justice.nkopane.justnotes.user.User;
 import com.justice.nkopane.justnotes.user.UserRepository;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,13 +22,17 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private UserDetailsService userDetailsService;
+    private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
 
-    public AuthService(UserRepository userRepository,PasswordEncoder passwordEncoder){
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, TokenService tokenService){
         this.passwordEncoder = passwordEncoder;
         this.userRepository= userRepository;
+        this.authenticationManager = authenticationManager;
+        this.tokenService = tokenService;
     }
 
-    public void Register(RegisterRequest registerRequest){
+    public void register(RegisterRequest registerRequest){
         Set<Role> roles = new HashSet<>();
         roles.add(Role.MEMBER);
 
@@ -39,9 +47,16 @@ public class AuthService {
         userRepository.save(user);
     }
 
-//    public void Authenticate(@Valid @RequestBody AuthenticateRequest authenticateRequest){
-////        UserDetails user = userDetailsService.loadUserByUsername(authenticateRequest.email());
-////        if(user != null)
-////            //return "Authentication Successful";
-//    }
+    public AuthenticationResponse authenticate(AuthenticateRequest authenticateRequest){
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(authenticateRequest.email(), authenticateRequest.password())
+        );
+
+        if(authentication.isAuthenticated()){
+            String token = tokenService.generateToken(authentication);
+            return AuthenticationResponse.builder().accessToken(token).build();
+        }
+
+        return AuthenticationResponse.builder().accessToken("").build();
+    }
 }

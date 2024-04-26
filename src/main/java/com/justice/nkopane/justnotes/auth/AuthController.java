@@ -19,7 +19,12 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest registerRequest){
-        authService.Register(registerRequest);
-        return ResponseEntity.status(HttpStatus.OK).body("Registration Successful");
+        authService.register(registerRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Registration Successful");
+    }
+
+    @PostMapping("/login")
+    public  AuthenticationResponse login(@Valid @RequestBody AuthenticateRequest authenticateRequest){
+        return authService.authenticate(authenticateRequest);
     }
 }
