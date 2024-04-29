@@ -29,12 +29,7 @@ public class Note{
     @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User userId;
-
-    @NotBlank(message = "Note Title Cannot be blank")
-    @Size(message = "Title must be min 3 and max 100", min = 3, max = 200)
     private String title;
-    @NotBlank(message = "Note Content Cannot be blank")
-    @Size(message = "Title must be min 3 and max 1500", min = 3, max = 1500)
     private String content;
     @CreatedDate
     private Date dateCreated;
