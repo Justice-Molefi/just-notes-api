@@ -1,9 +1,9 @@
-package com.justice.nkopane.justnotes.notes;
+package com.justice.nkopane.justnotes.note;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record NoteDto(
+public record NoteRequest(
         @NotBlank(message = "Note Title Cannot be blank")
         @Size(message = "Title must be min 3 and max 100", min = 3, max = 200)
         String title,

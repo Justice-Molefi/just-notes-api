@@ -3,6 +3,7 @@ package com.justice.nkopane.justnotes.auth;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +19,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest registerRequest){
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest registerRequest) throws MethodArgumentNotValidException{
         authService.register(registerRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body("Registration Successful");
     }

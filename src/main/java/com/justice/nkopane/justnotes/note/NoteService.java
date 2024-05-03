@@ -1,4 +1,4 @@
-package com.justice.nkopane.justnotes.notes;
+package com.justice.nkopane.justnotes.note;
 
 import com.justice.nkopane.justnotes.user.User;
 import com.justice.nkopane.justnotes.user.UserRepository;
@@ -6,9 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class NoteService {
@@ -20,7 +18,7 @@ public class NoteService {
         this.userRepository = userRepository;
     }
 
-    public Note createNote(NoteDto noteDto){
+    public void createNote(NoteRequest noteRequest){
         Calendar calendar = Calendar.getInstance();
         Date currentDate = calendar.getTime();
 
@@ -31,33 +29,50 @@ public class NoteService {
             Note note = Note.builder()
                     .id(UUID.randomUUID())
                     .userId(authenticatedUser.get())
-                    .title(noteDto.title())
-                    .content(noteDto.content())
+                    .title(noteRequest.title())
+                    .content(noteRequest.content())
                     .dateCreated(currentDate)
                     .dateUpdated(currentDate)
                     .build();
-            return noteRepository.save(note);
+            noteRepository.save(note);
         }
-        return null;
     }
 
-    public List<NoteResponse> getNotes(){
+    public List<NoteDto> getNotes(){
         String authenticatedUserEmail =  getAuthentication().getName();
         Optional<User> authenticatedUser = userRepository.findByEmail(authenticatedUserEmail);
 
         return authenticatedUser.map(user -> noteRepository.findByUserId(user).
                 stream()
-                .map(this::mapToNoteResponse)
+                .map(this::mapToNoteDto)
                 .toList()).orElse(null);
     }
 
+    public void deleteNote(UUID uuid){
+        noteRepository.deleteById(uuid);
+    }
+
+    public void updateNote(NoteDto newNote){
+        Calendar calendar = Calendar.getInstance();
+        Date currentDate = calendar.getTime();
+        Optional<Note> DbNote = noteRepository.findById(newNote.getId());
+
+        if(DbNote.isPresent()){
+            Note note = DbNote.get();
+            note.setContent(newNote.getContent());
+            note.setTitle(newNote.getTitle());
+            note.setDateUpdated(currentDate);
+            noteRepository.save(note);
+        }
+    }
 
     private Authentication getAuthentication(){
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
-    private NoteResponse mapToNoteResponse(Note note) {
-        return NoteResponse.builder()
+    private NoteDto mapToNoteDto(Note note) {
+        return NoteDto.builder()
+                .id(note.getId())
                 .content(note.getContent())
                 .title(note.getTitle())
                 .dateCreated(note.getDateCreated())

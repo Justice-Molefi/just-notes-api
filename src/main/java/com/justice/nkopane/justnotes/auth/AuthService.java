@@ -3,6 +3,7 @@ package com.justice.nkopane.justnotes.auth;
 import com.justice.nkopane.justnotes.service.TokenService;
 import com.justice.nkopane.justnotes.user.Role;
 import com.justice.nkopane.justnotes.user.User;
+import com.justice.nkopane.justnotes.user.UserExistsException;
 import com.justice.nkopane.justnotes.user.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,7 +34,11 @@ public class AuthService {
         this.tokenService = tokenService;
     }
 
-    public void register(RegisterRequest registerRequest){
+    public void register(RegisterRequest registerRequest) throws UserExistsException {
+        Optional<User> DbUser = userRepository.findByEmail(registerRequest.email());
+        if(DbUser.isPresent()){
+            throw new UserExistsException("Invalid Request");
+        }
         Set<Role> roles = new HashSet<>();
         roles.add(Role.MEMBER);
 

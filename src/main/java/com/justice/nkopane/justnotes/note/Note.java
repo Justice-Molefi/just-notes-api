@@ -1,12 +1,10 @@
-package com.justice.nkopane.justnotes.notes;
+package com.justice.nkopane.justnotes.note;
 
 import com.justice.nkopane.justnotes.user.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

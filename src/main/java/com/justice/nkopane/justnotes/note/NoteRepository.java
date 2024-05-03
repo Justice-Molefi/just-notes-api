@@ -1,4 +1,4 @@
-package com.justice.nkopane.justnotes.notes;
+package com.justice.nkopane.justnotes.note;
 
 import com.justice.nkopane.justnotes.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
